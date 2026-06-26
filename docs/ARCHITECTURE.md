@@ -38,5 +38,6 @@ docker/             Dockerfile, nginx.conf, entrypoint.sh
 - Модули **Расписание/Финансы** включаются в `config/crm.php` и гейтятся middleware `module:*`.
 
 ## Темизация
-Цвет бренда хранится в `settings.theme_primary` и инжектится в `--color-primary` в layout.
-Все блоки используют только `var(--…)` — перекраска не требует пересборки SCSS.
+Цвета задаются в `resources/scss/_tokens.scss` через CSS-переменные (`--color-primary`, `--color-bg` и т.д.).
+Все блоки используют только `var(--…)`. Смена палитры — правка `_tokens.scss` + `npm run build`.
+Рантайм-смены цвета нет: `settings.theme_primary` более не используется.

@@ -3,8 +3,9 @@
 .card {
     background: var(--color-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
+    border-radius: 14px;
+    box-shadow: 0 1px 4px rgba(16, 24, 40, .06), 0 0 0 0 transparent;
+    transition: box-shadow .15s;
 
     &__head {
         display: flex;
@@ -17,6 +18,8 @@
 
     &__title {
         font-size: var(--fs-lg);
+        font-weight: 600;
+        color: var(--color-text);
     }
 
     &__sub {
@@ -30,6 +33,11 @@
 
     &--flush &__body {
         padding: 0;
+    }
+
+    // Мягкий hover — только лёгкое усиление тени
+    &--hoverable:hover {
+        box-shadow: var(--shadow);
     }
 }
 

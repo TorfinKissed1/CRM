@@ -17,10 +17,8 @@ class Index extends Component
 {
     public string $tab = 'profile';
 
-    // Профиль бизнеса / тема
+    // Профиль бизнеса
     public string $businessName = '';
-
-    public string $themePrimary = '';
 
     public string $currencySymbol = '';
 
@@ -51,7 +49,6 @@ class Index extends Component
     {
         $this->guardOwner();
         $this->businessName = Crm::businessName();
-        $this->themePrimary = Crm::primaryColor();
         $this->currencySymbol = Crm::currencySymbol();
         $this->resetStaffForm();
         $this->resetServiceForm();
@@ -65,12 +62,10 @@ class Index extends Component
 
         $this->validate([
             'businessName' => 'required|string|max:120',
-            'themePrimary' => 'required|regex:/^#[0-9a-fA-F]{3,8}$/',
             'currencySymbol' => 'required|string|max:8',
         ]);
 
         Setting::put('business_name', $this->businessName);
-        Setting::put('theme_primary', $this->themePrimary);
         Setting::put('currency_symbol', $this->currencySymbol);
 
         $this->dispatch('toast', message: 'Профиль сохранён.');

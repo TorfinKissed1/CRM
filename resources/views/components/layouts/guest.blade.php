@@ -7,7 +7,6 @@
     <title>{{ $title ?? Crm::businessName() }}</title>
     @livewireStyles
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
-    <style>:root { --color-primary: {{ Crm::primaryColor() }}; }</style>
 </head>
 <body class="auth">
     <main class="auth__frame">

@@ -1,27 +1,39 @@
 // Дизайн-токены проекта — единственный источник правды по визуалу.
-// Реальные значения живут в CSS-переменных (:root), чтобы их можно было
-// переопределять в рантайме (тема бизнеса из БД -> --color-primary и т.п.).
+// Все цвета/отступы/тени живут здесь в CSS-переменных (:root). Чтобы перекрасить
+// продукт под другой бренд — разработчик меняет значения тут, и всё подхватывается.
 
 :root {
-    // --- Цвета бренда (переопределяются темой бизнеса) ---
-    --color-primary: #2f6fed;
-    --color-primary-600: #2a63d4;
-    --color-primary-050: #eaf1fe;
+    // --- Цвета бренда ---
+    --color-primary: #4f6ef7;
+    --color-primary-600: #3f5ae0;
+    --color-primary-700: #3349c8;
+    --color-primary-050: #eef2fe;
+
+    // --- Цвета графиков ---
+    --chart-1: #4f6ef7;
+    --chart-2: #1bb39a;
+    --chart-3: #8b5cf6;
+    --chart-4: #f5a623;
+    --chart-5: #ec5f8a;
 
     // --- Поверхности и текст ---
-    --color-bg: #f5f6f8;
+    --color-bg: #f4f6fb;
     --color-surface: #ffffff;
-    --color-surface-2: #fafbfc;
-    --color-border: #e6e8ec;
-    --color-text: #1d2330;
-    --color-text-muted: #6b7280;
-    --color-text-soft: #9aa1ad;
+    --color-surface-2: #f7f9fc;
+    --color-border: #e8ecf3;
+    --color-text: #161b26;
+    --color-text-muted: #5b6573;
+    --color-text-soft: #98a2b3;
 
     // --- Статусы ---
-    --color-success: #1f9d55;
-    --color-danger: #e02424;
-    --color-warning: #d97706;
-    --color-info: #2f6fed;
+    --color-success: #15a86b;
+    --color-danger: #e0483e;
+    --color-warning: #e0973a;
+    --color-info: #4f6ef7;
+
+    // --- Тренд-стрелки ---
+    --color-up: #15a86b;
+    --color-down: #e0483e;
 
     // --- Типографика ---
     --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -35,11 +47,11 @@
     // --- Скругления / тени ---
     --radius-sm: 6px;
     --radius: 10px;
-    --radius-lg: 16px;
+    --radius-lg: 14px;
     --radius-pill: 999px;
-    --shadow-sm: 0 1px 2px rgba(16, 24, 40, .06);
+    --shadow-sm: 0 1px 3px rgba(16, 24, 40, .05), 0 1px 2px rgba(16, 24, 40, .04);
     --shadow: 0 4px 16px rgba(16, 24, 40, .08);
-    --shadow-lg: 0 12px 32px rgba(16, 24, 40, .14);
+    --shadow-lg: 0 12px 32px rgba(16, 24, 40, .12);
 
     // --- Отступы (шкала 4px) ---
     --space-1: 4px;

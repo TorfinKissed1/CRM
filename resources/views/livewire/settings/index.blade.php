@@ -10,7 +10,7 @@
     {{-- ПРОФИЛЬ --}}
     @if ($tab === 'profile')
         <div class="card" style="max-width:520px">
-            <div class="card__head"><h2 class="card__title">Профиль и тема</h2></div>
+            <div class="card__head"><h2 class="card__title">Профиль бизнеса</h2></div>
             <div class="card__body">
                 <form class="form" wire:submit="saveProfile">
                     <label class="field">
@@ -18,16 +18,11 @@
                         <input type="text" class="field__input" wire:model="businessName">
                         @error('businessName') <span class="field__error">{{ $message }}</span> @enderror
                     </label>
-                    <div class="field-row">
-                        <label class="field">
-                            <span class="field__label">Цвет темы</span>
-                            <input type="color" class="field__input" wire:model="themePrimary" style="height:42px;padding:4px">
-                        </label>
-                        <label class="field">
-                            <span class="field__label">Символ валюты</span>
-                            <input type="text" class="field__input" wire:model="currencySymbol">
-                        </label>
-                    </div>
+                    <label class="field">
+                        <span class="field__label">Символ валюты</span>
+                        <input type="text" class="field__input" wire:model="currencySymbol">
+                        @error('currencySymbol') <span class="field__error">{{ $message }}</span> @enderror
+                    </label>
                     <div><button type="submit" class="btn btn--primary">Сохранить</button></div>
                 </form>
             </div>
