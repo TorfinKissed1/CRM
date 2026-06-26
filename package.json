@@ -1,0 +1,16 @@
+{
+    "$schema": "https://www.schemastore.org/package.json",
+    "private": true,
+    "type": "module",
+    "scripts": {
+        "build": "vite build",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "concurrently": "^9.0.1",
+        "laravel-vite-plugin": "^3.1",
+        "sass": "^1.83.0",
+        "sortablejs": "^1.15.6",
+        "vite": "^8.0.0"
+    }
+}

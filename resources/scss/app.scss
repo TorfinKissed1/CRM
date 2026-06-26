@@ -1,0 +1,12 @@
+// Точка входа стилей. Архитектура: БЭМ, 1 блок = 1 файл в blocks/.
+// Токены и база подключаются первыми, затем блоки по алфавиту.
+
+@use 'tokens';
+@use 'base';
+
+// --- БЭМ-блоки (добавляются по мере разработки) ---
+// @use 'blocks/app-shell';
+// @use 'blocks/sidebar';
+// @use 'blocks/topbar';
+// @use 'blocks/kpi-card';
+// @use 'blocks/data-table';
