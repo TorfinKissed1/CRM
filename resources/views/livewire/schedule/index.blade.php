@@ -4,7 +4,7 @@
         <button class="btn btn--ghost btn--sm" wire:click="prevDay">←</button>
         <button class="btn btn--ghost btn--sm" wire:click="goToday">Сегодня</button>
         <button class="btn btn--ghost btn--sm" wire:click="nextDay">→</button>
-        <span class="schedule__day">{{ $day->translatedFormat('l, d MMMM') }}</span>
+        <span class="schedule__day">{{ $day->isoFormat('dddd, D MMMM') }}</span>
         <div class="toolbar__spacer"></div>
         <button class="btn btn--primary btn--sm" wire:click="create">@include('partials.icons', ['name' => 'plus']) {{ Crm::label('appointment') }}</button>
     </div>

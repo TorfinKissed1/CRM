@@ -2,6 +2,7 @@
 
 .table-wrap {
     overflow-x: auto;
+    border-radius: 0 0 14px 14px; // если внутри .card--flush
 }
 
 .table {
@@ -9,35 +10,47 @@
     border-collapse: collapse;
     font-size: var(--fs-sm);
 
+    // Заголовок: мелкий uppercase muted
     th {
         text-align: left;
-        padding: 12px 16px;
+        padding: 10px 16px;
         font-size: var(--fs-xs);
         font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: .03em;
-        color: var(--color-text-soft);
+        letter-spacing: .05em;
+        color: var(--color-text-muted);
         border-bottom: 1px solid var(--color-border);
+        background: var(--color-surface-2);
         white-space: nowrap;
+        user-select: none;
     }
 
     td {
-        padding: 12px 16px;
+        padding: 13px 16px;
         border-bottom: 1px solid var(--color-border);
         vertical-align: middle;
+        color: var(--color-text);
     }
 
     tbody tr:last-child td {
         border-bottom: none;
     }
 
-    tbody tr:hover {
+    // Очень лёгкий hover
+    tbody tr:hover td {
         background: var(--color-surface-2);
     }
 
+    // Утилиты ячеек
     &__name {
         font-weight: 600;
         color: var(--color-text);
+    }
+
+    &__sub {
+        font-size: var(--fs-xs);
+        color: var(--color-text-soft);
+        margin-top: 2px;
     }
 
     &__muted {
@@ -48,5 +61,23 @@
         display: flex;
         gap: 6px;
         justify-content: flex-end;
+    }
+
+    // Сортируемый заголовок
+    &__sort {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        cursor: pointer;
+
+        &:hover {
+            color: var(--color-text);
+        }
+    }
+
+    // Числовые ячейки — выровнять вправо
+    &--num {
+        text-align: right;
+        font-variant-numeric: tabular-nums;
     }
 }

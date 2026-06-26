@@ -22,7 +22,6 @@
     <title>{{ $pageTitle }} · {{ Crm::businessName() }}</title>
     @livewireStyles
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
-    <style>:root { --color-primary: {{ Crm::primaryColor() }}; }</style>
 </head>
 <body class="app">
     <div class="app-shell">
@@ -60,7 +59,7 @@
         <div class="app-main">
             <header class="topbar">
                 <h1 class="topbar__title">{{ $pageTitle }}</h1>
-                <div class="topbar__date">{{ Carbon::now()->translatedFormat('l, d MMMM') }}</div>
+                <div class="topbar__date">{{ Carbon::now()->isoFormat('dddd, D MMMM') }}</div>
             </header>
 
             <main class="content">

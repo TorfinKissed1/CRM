@@ -8,19 +8,21 @@
     border-right: 1px solid var(--color-border);
     display: flex;
     flex-direction: column;
-    padding: var(--space-4);
+    padding: var(--space-3) var(--space-4) var(--space-4);
     z-index: 20;
+    box-shadow: 2px 0 12px rgba(16, 24, 40, .04);
 
     &__brand {
         display: flex;
         align-items: center;
         gap: var(--space-3);
-        padding: var(--space-2) var(--space-2) var(--space-5);
+        padding: var(--space-3) var(--space-2) var(--space-5);
+        text-decoration: none;
     }
 
     &__logo {
-        width: 34px;
-        height: 34px;
+        width: 36px;
+        height: 36px;
         flex: none;
         border-radius: var(--radius);
         background: var(--color-primary);
@@ -28,11 +30,18 @@
         display: grid;
         place-items: center;
         font-weight: 700;
+        font-size: var(--fs-base);
+        letter-spacing: .02em;
+        box-shadow: 0 2px 8px rgba(79, 110, 247, .30);
     }
 
     &__name {
         font-weight: 600;
-        font-size: var(--fs-lg);
+        font-size: var(--fs-base);
+        color: var(--color-text);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
 
     &__foot {
@@ -49,16 +58,20 @@
     display: flex;
     flex-direction: column;
     gap: 2px;
+    flex: 1;
 
     &__item {
         display: flex;
         align-items: center;
         gap: var(--space-3);
-        padding: 10px var(--space-3);
+        padding: 9px var(--space-3);
         border-radius: var(--radius);
         color: var(--color-text-muted);
+        font-size: var(--fs-sm);
         font-weight: 500;
-        transition: background .12s, color .12s;
+        transition: background .15s, color .15s;
+        position: relative;
+        text-decoration: none;
 
         &:hover {
             background: var(--color-surface-2);
@@ -68,12 +81,37 @@
         &--active,
         &--active:hover {
             background: var(--color-primary-050);
-            color: var(--color-primary-600);
+            color: var(--color-primary);
+            font-weight: 600;
+
+            // Тонкая левая полоска-акцент
+            &::before {
+                content: '';
+                position: absolute;
+                left: 0;
+                top: 6px;
+                bottom: 6px;
+                width: 3px;
+                border-radius: var(--radius-pill);
+                background: var(--color-primary);
+            }
         }
     }
 
     &__icon {
         display: inline-flex;
+        flex: none;
+        width: 20px;
+        height: 20px;
+
+        .icon {
+            width: 20px;
+            height: 20px;
+        }
+    }
+
+    &__label {
+        line-height: 1;
     }
 }
 
@@ -94,23 +132,26 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        color: var(--color-text);
     }
 
     &__role {
         font-size: var(--fs-xs);
         color: var(--color-text-soft);
+        margin-top: 1px;
     }
 }
 
 .avatar {
-    width: 36px;
-    height: 36px;
+    width: 34px;
+    height: 34px;
     flex: none;
     border-radius: 50%;
     background: var(--color-primary-050);
-    color: var(--color-primary-600);
+    color: var(--color-primary);
     display: grid;
     place-items: center;
     font-weight: 600;
     font-size: var(--fs-sm);
+    letter-spacing: .02em;
 }

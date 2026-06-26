@@ -1,66 +1,104 @@
-// Кнопки.
+// Кнопки — без чёрных outline/border по умолчанию.
 
 .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-    padding: 9px 16px;
+    padding: 9px 18px;
     border: 1px solid transparent;
-    border-radius: var(--radius);
+    border-radius: 10px;
     font-weight: 600;
     font-size: var(--fs-sm);
     line-height: 1;
     background: var(--color-surface);
     color: var(--color-text);
-    transition: background .15s, border-color .15s, opacity .15s;
+    cursor: pointer;
+    transition: background .15s, border-color .15s, box-shadow .15s, opacity .15s;
     white-space: nowrap;
+    outline: none; // убираем дефолтный чёрный outline
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: 0 0 0 3px var(--color-primary-050);
+    }
 
     &:hover {
         background: var(--color-surface-2);
     }
 
-    &:disabled {
-        opacity: .55;
+    &:disabled,
+    &[disabled] {
+        opacity: .5;
         cursor: not-allowed;
+        pointer-events: none;
     }
 
     .icon {
         width: 16px;
         height: 16px;
+        flex-shrink: 0;
     }
 
+    // Primary — заполненный с намёком-тенью
     &--primary {
         background: var(--color-primary);
         color: #fff;
+        border-color: transparent;
+        box-shadow: 0 1px 3px rgba(79, 110, 247, .25);
 
         &:hover {
             background: var(--color-primary-600);
+            box-shadow: 0 2px 6px rgba(79, 110, 247, .35);
+        }
+
+        &:focus-visible {
+            box-shadow: 0 0 0 3px var(--color-primary-050), 0 1px 3px rgba(79, 110, 247, .25);
         }
     }
 
+    // Ghost — с рамкой токена-border, без чёрного outline
     &--ghost {
         background: transparent;
         border-color: var(--color-border);
+        color: var(--color-text);
 
         &:hover {
             background: var(--color-surface-2);
+            border-color: var(--color-border);
+        }
+
+        &:focus-visible {
+            box-shadow: 0 0 0 3px var(--color-primary-050);
         }
     }
 
+    // Danger
     &--danger {
         background: var(--color-danger);
         color: #fff;
+        border-color: transparent;
+        box-shadow: 0 1px 3px rgba(224, 72, 62, .2);
 
         &:hover {
             opacity: .9;
-            background: var(--color-danger);
+        }
+
+        &:focus-visible {
+            box-shadow: 0 0 0 3px rgba(224, 72, 62, .2);
         }
     }
 
+    // Размеры
     &--sm {
         padding: 6px 12px;
         font-size: var(--fs-xs);
+        border-radius: var(--radius-sm);
+    }
+
+    &--lg {
+        padding: 12px 24px;
+        font-size: var(--fs-base);
     }
 
     &--block {
@@ -69,5 +107,6 @@
 
     &--icon {
         padding: 8px;
+        border-radius: var(--radius);
     }
 }

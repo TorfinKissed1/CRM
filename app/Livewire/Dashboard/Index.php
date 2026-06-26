@@ -19,38 +19,104 @@ class Index extends Component
     {
         $today = Carbon::today();
         $weekStart = $today->copy()->subDays(6)->startOfDay();
+        $prevWeekStart = $today->copy()->subDays(13)->startOfDay();
+        $prevWeekEnd = $today->copy()->subDays(7)->endOfDay();
 
+        // ── KPI ────────────────────────────────────────────────────────────
         $appointmentsToday = Appointment::whereDate('starts_at', $today)->count();
 
-        $revenueWeek = Transaction::where('type', TransactionType::Income)
+        // среднее за прошлые 6 дней (вчера..минус6), для дельты «записей сегодня»
+        $avgPrev6 = Appointment::whereBetween('starts_at', [
+            $today->copy()->subDays(6)->startOfDay(),
+            $today->copy()->subDays(1)->endOfDay(),
+        ])->count() / 6;
+
+        $apptDeltaPct = $avgPrev6 > 0
+            ? round(($appointmentsToday - $avgPrev6) / $avgPrev6 * 100, 1)
+            : null;
+
+        // выручка текущей и предыдущей 7-дневки
+        $revenueWeek = (float) Transaction::where('type', TransactionType::Income)
             ->whereBetween('occurred_at', [$weekStart, now()])
             ->sum('amount');
 
+        $revenuePrevWeek = (float) Transaction::where('type', TransactionType::Income)
+            ->whereBetween('occurred_at', [$prevWeekStart, $prevWeekEnd])
+            ->sum('amount');
+
+        $revenueDeltaPct = $revenuePrevWeek > 0
+            ? round(($revenueWeek - $revenuePrevWeek) / $revenuePrevWeek * 100, 1)
+            : null;
+
         $newClients = Client::where('created_at', '>=', $today->copy()->subDays(30))->count();
 
+        // завершённых на этой неделе vs предыдущей
         $completedWeek = Appointment::where('status', AppointmentStatus::Completed)
             ->whereBetween('starts_at', [$weekStart, $today->copy()->endOfDay()])
             ->count();
 
-        $chart = collect(range(6, 0))->map(function ($offset) use ($today) {
+        $completedPrevWeek = Appointment::where('status', AppointmentStatus::Completed)
+            ->whereBetween('starts_at', [$prevWeekStart, $prevWeekEnd])
+            ->count();
+
+        $completedDeltaPct = $completedPrevWeek > 0
+            ? round(($completedWeek - $completedPrevWeek) / $completedPrevWeek * 100, 1)
+            : null;
+
+        // ── График «Записи по дням» (7 столбцов) ─────────────────────────
+        $chart = collect(range(6, 0))->map(function (int $offset) use ($today): array {
             $day = $today->copy()->subDays($offset);
 
             return [
-                'label' => $day->translatedFormat('EEE'),
+                'label' => $day->isoFormat('dd'),   // пн, вт, ...
                 'count' => Appointment::whereDate('starts_at', $day)->count(),
             ];
         });
         $chartMax = max(1, $chart->max('count'));
 
+        // ── Спарклайн выручки (14 дней) ──────────────────────────────────
+        $sparkRevenue = collect(range(13, 0))->map(function (int $offset) use ($today): array {
+            $day = $today->copy()->subDays($offset);
+            $amt = (float) Transaction::where('type', TransactionType::Income)
+                ->whereDate('occurred_at', $day)
+                ->sum('amount');
+
+            return [
+                'label' => $day->isoFormat('D.MM'),
+                'amount' => $amt,
+            ];
+        });
+
+        // ── Пончик «Клиенты по городам» ──────────────────────────────────
+        $cityRaw = Client::selectRaw("COALESCE(NULLIF(TRIM(city),''), 'Не указан') as city_name, COUNT(*) as total")
+            ->groupBy('city_name')
+            ->orderByDesc('total')
+            ->limit(5)
+            ->get();
+
+        $cityTotal = max(1, $cityRaw->sum('total'));
+        $chartColors = ['--chart-1', '--chart-2', '--chart-3', '--chart-4', '--chart-5'];
+
+        $donut = $cityRaw->values()->map(function ($row, int $i) use ($cityTotal, $chartColors): array {
+            return [
+                'label' => $row->city_name,
+                'count' => (int) $row->total,
+                'pct' => round($row->total / $cityTotal * 100),
+                'color' => $chartColors[$i] ?? '--chart-5',
+            ];
+        });
+
+        // ── Персонал ──────────────────────────────────────────────────────
         $staffStats = Staff::active()->orderBy('sort')->get()->map(fn (Staff $s) => [
             'staff' => $s,
             'count' => $s->appointments()
                 ->whereBetween('starts_at', [$weekStart, $today->copy()->endOfDay()])->count(),
-            'earned' => Transaction::where('staff_id', $s->id)
+            'earned' => (float) Transaction::where('staff_id', $s->id)
                 ->where('type', TransactionType::Income)
                 ->whereBetween('occurred_at', [$weekStart, now()])->sum('amount'),
         ]);
 
+        // ── Сегодняшние записи ────────────────────────────────────────────
         $todayAppointments = Appointment::with(['client', 'staff', 'service'])
             ->whereDate('starts_at', $today)
             ->orderBy('starts_at')
@@ -58,11 +124,16 @@ class Index extends Component
 
         return view('livewire.dashboard.index', compact(
             'appointmentsToday',
+            'apptDeltaPct',
             'revenueWeek',
+            'revenueDeltaPct',
             'newClients',
             'completedWeek',
+            'completedDeltaPct',
             'chart',
             'chartMax',
+            'sparkRevenue',
+            'donut',
             'staffStats',
             'todayAppointments',
         ));

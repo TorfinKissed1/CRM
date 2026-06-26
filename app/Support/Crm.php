@@ -26,11 +26,6 @@ class Crm
         return self::setting('business_name', config('crm.business_name', 'CRM'));
     }
 
-    public static function primaryColor(): string
-    {
-        return self::setting('theme_primary', config('crm.theme.primary', '#2f6fed'));
-    }
-
     public static function currencySymbol(): string
     {
         return self::setting('currency_symbol', config('crm.currency_symbol', '₽'));

@@ -1,0 +1,9 @@
+{
+    "The :attribute field is required.": "Поле «:attribute» обязательно для заполнения.",
+    "The :attribute must be a valid email address.": "Поле «:attribute» должно быть действительным адресом электронной почты.",
+    "These credentials do not match our records.": "Неверные учётные данные.",
+    "Too many login attempts. Please try again in :seconds seconds.": "Слишком много попыток входа. Попробуйте через :seconds секунд.",
+    "The given data was invalid.": "Переданные данные недействительны.",
+    "Unauthenticated.": "Требуется авторизация.",
+    "This action is unauthorized.": "Это действие не разрешено."
+}

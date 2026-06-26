@@ -17,7 +17,8 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        // Русская локаль для дат (дни недели/месяцы в дашборде и расписании).
+        // Русская локаль для Laravel и Carbon (дни недели/месяцы в дашборде и расписании).
+        app()->setLocale('ru');
         Carbon::setLocale('ru');
         CarbonImmutable::setLocale('ru');
 

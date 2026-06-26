@@ -1,0 +1,110 @@
+// Блок SVG-графиков дашборда: столбцы, спарклайн, пончик.
+// Типографика внутри SVG реализуется через CSS-классы на <text>.
+
+// ── Базовый SVG-контейнер ────────────────────────────────────────────────
+.chart-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+
+    // Подписи значений над столбцами
+    &__val {
+        font-family: var(--font-sans);
+        font-size: 11px;
+        font-weight: 700;
+        fill: var(--color-text);
+        pointer-events: none;
+    }
+
+    // Подписи осей / дней
+    &__label {
+        font-family: var(--font-sans);
+        font-size: 11px;
+        font-weight: 400;
+        fill: var(--color-text-soft);
+        pointer-events: none;
+    }
+
+    // Центральные тексты пончика
+    &__center-num {
+        font-family: var(--font-sans);
+        font-size: 22px;
+        font-weight: 700;
+        fill: var(--color-text);
+        pointer-events: none;
+    }
+
+    &__center-label {
+        font-family: var(--font-sans);
+        font-size: 11px;
+        font-weight: 400;
+        fill: var(--color-text-muted);
+        pointer-events: none;
+    }
+
+    // Модификатор для спарклайна (чуть меньше высота)
+    &--spark {
+        max-height: 160px;
+    }
+
+    // Модификатор для пончика (фиксированная высота)
+    &--donut {
+        max-height: 200px;
+        flex: none;
+    }
+}
+
+// ── Обёртка пончика (SVG + легенда рядом) ────────────────────────────────
+.donut-wrap {
+    display: flex;
+    align-items: center;
+    gap: var(--space-5);
+    flex-wrap: wrap;
+
+    .chart-svg--donut {
+        flex: none;
+        width: 200px;
+    }
+}
+
+// ── Легенда пончика ───────────────────────────────────────────────────────
+.donut-legend {
+    flex: 1;
+    min-width: 120px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+
+    &__item {
+        display: flex;
+        align-items: center;
+        gap: var(--space-2);
+        font-size: var(--fs-sm);
+    }
+
+    &__dot {
+        flex: none;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    &__name {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: var(--color-text);
+    }
+
+    &__pct {
+        flex: none;
+        font-weight: 600;
+        color: var(--color-text-muted);
+    }
+}
