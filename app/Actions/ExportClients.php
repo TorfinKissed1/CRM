@@ -24,7 +24,9 @@ class ExportClients
 
     public function handle(): BinaryFileResponse
     {
-        $path = tempnam(sys_get_temp_dir(), 'clients_').'.xlsx';
+        $base = tempnam(sys_get_temp_dir(), 'clients_');
+        $path = $base.'.xlsx';
+        @unlink($base); // tempnam создаёт пустышку без .xlsx — убираем, чтобы не текла
 
         $writer = new Writer;
         $writer->openToFile($path);

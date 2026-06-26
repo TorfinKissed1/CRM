@@ -12,7 +12,9 @@ class ExportTransactions
 {
     public function handle(?Carbon $start = null): BinaryFileResponse
     {
-        $path = tempnam(sys_get_temp_dir(), 'finance_').'.xlsx';
+        $base = tempnam(sys_get_temp_dir(), 'finance_');
+        $path = $base.'.xlsx';
+        @unlink($base); // tempnam создаёт пустышку без .xlsx — убираем, чтобы не текла
 
         $writer = new Writer;
         $writer->openToFile($path);

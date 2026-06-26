@@ -42,7 +42,7 @@ class Import extends Component
 
     public function import(): void
     {
-        $this->validate(['file' => 'required|file']);
+        $this->validate(['file' => 'required|file|max:10240']);
 
         $this->result = app(ImportClients::class)->handle(
             $this->file->getRealPath(),

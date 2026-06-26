@@ -140,6 +140,8 @@ class ImportClients
                 $i++;
 
                 if (empty($data['name'])) {
+                    $skipped++; // строки без имени тоже учитываем в сводке
+
                     continue;
                 }
 
