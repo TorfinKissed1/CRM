@@ -1,39 +1,40 @@
 // Дизайн-токены проекта — единственный источник правды по визуалу.
+// Тема: тёмная «ночная» с фиолетовыми акцентами (звёздный вайб).
 // Все цвета/отступы/тени живут здесь в CSS-переменных (:root). Чтобы перекрасить
 // продукт под другой бренд — разработчик меняет значения тут, и всё подхватывается.
 
 :root {
-    // --- Цвета бренда ---
-    --color-primary: #4f6ef7;
-    --color-primary-600: #3f5ae0;
-    --color-primary-700: #3349c8;
-    --color-primary-050: #eef2fe;
+    // --- Цвета бренда (фиолет) ---
+    --color-primary: #8b5cf6;
+    --color-primary-600: #7a4fe6;
+    --color-primary-700: #6a40c9;
+    --color-primary-050: #221a3d; // тёмная фиолет-подложка (active/hover/focus) на тёмном фоне
 
-    // --- Цвета графиков ---
-    --chart-1: #4f6ef7;
-    --chart-2: #1bb39a;
-    --chart-3: #8b5cf6;
-    --chart-4: #f5a623;
-    --chart-5: #ec5f8a;
+    // --- Цвета графиков («звёздная» палитра: фиолеты + циан) ---
+    --chart-1: #8b5cf6;
+    --chart-2: #22d3ee;
+    --chart-3: #c084fc;
+    --chart-4: #f0abfc;
+    --chart-5: #38bdf8;
 
-    // --- Поверхности и текст ---
-    --color-bg: #f4f6fb;
-    --color-surface: #ffffff;
-    --color-surface-2: #f7f9fc;
-    --color-border: #e8ecf3;
-    --color-text: #161b26;
-    --color-text-muted: #5b6573;
-    --color-text-soft: #98a2b3;
+    // --- Поверхности и текст (ночные) ---
+    --color-bg: #0d0a1a;        // глубокий ночной индиго
+    --color-surface: #16122b;   // приподнятые карточки
+    --color-surface-2: #1e1840; // ещё выше / hover
+    --color-border: #2a2350;    // мягкая фиолет-граница
+    --color-text: #ece9f7;
+    --color-text-muted: #a79fc6;
+    --color-text-soft: #7a7299;
 
-    // --- Статусы ---
-    --color-success: #15a86b;
-    --color-danger: #e0483e;
-    --color-warning: #e0973a;
-    --color-info: #4f6ef7;
+    // --- Статусы (яркие на тёмном) ---
+    --color-success: #34d399;
+    --color-danger: #fb7185;
+    --color-warning: #fbbf24;
+    --color-info: #8b5cf6;
 
     // --- Тренд-стрелки ---
-    --color-up: #15a86b;
-    --color-down: #e0483e;
+    --color-up: #34d399;
+    --color-down: #fb7185;
 
     // --- Типографика ---
     --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
@@ -44,14 +45,15 @@
     --fs-xl: 22px;
     --fs-2xl: 28px;
 
-    // --- Скругления / тени ---
+    // --- Скругления / тени (глубокие, с лёгким фиолет-свечением) ---
     --radius-sm: 6px;
     --radius: 10px;
     --radius-lg: 14px;
     --radius-pill: 999px;
-    --shadow-sm: 0 1px 3px rgba(16, 24, 40, .05), 0 1px 2px rgba(16, 24, 40, .04);
-    --shadow: 0 4px 16px rgba(16, 24, 40, .08);
-    --shadow-lg: 0 12px 32px rgba(16, 24, 40, .12);
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .35);
+    --shadow: 0 8px 24px rgba(0, 0, 0, .45);
+    --shadow-lg: 0 20px 48px rgba(8, 4, 24, .6);
+    --glow-primary: 0 0 0 3px rgba(139, 92, 246, .25); // focus-ring/акцент
 
     // --- Отступы (шкала 4px) ---
     --space-1: 4px;
@@ -65,5 +67,5 @@
     // --- Лейаут ---
     --sidebar-width: 248px;
     --topbar-height: 64px;
-    --content-max: 1200px;
+    --content-max: 1480px; // дашборд/контент шире, без пустоты справа
 }

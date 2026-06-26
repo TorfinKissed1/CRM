@@ -26,10 +26,11 @@ class Index extends Component
         $appointmentsToday = Appointment::whereDate('starts_at', $today)->count();
 
         // среднее за прошлые 6 дней (вчера..минус6), для дельты «записей сегодня»
-        $avgPrev6 = Appointment::whereBetween('starts_at', [
+        $prevCount = Appointment::whereBetween('starts_at', [
             $today->copy()->subDays(6)->startOfDay(),
             $today->copy()->subDays(1)->endOfDay(),
-        ])->count() / 6;
+        ])->count();
+        $avgPrev6 = $prevCount / 6;
 
         $apptDeltaPct = $avgPrev6 > 0
             ? round(($appointmentsToday - $avgPrev6) / $avgPrev6 * 100, 1)
@@ -106,7 +107,7 @@ class Index extends Component
             ];
         });
 
-        // ── Персонал ──────────────────────────────────────────────────────
+        // ── Персонал: загрузка + выручка за неделю ────────────────────────
         $staffStats = Staff::active()->orderBy('sort')->get()->map(fn (Staff $s) => [
             'staff' => $s,
             'count' => $s->appointments()
@@ -115,6 +116,35 @@ class Index extends Component
                 ->where('type', TransactionType::Income)
                 ->whereBetween('occurred_at', [$weekStart, now()])->sum('amount'),
         ]);
+
+        // ── Топ услуги (по числу завершённых записей за 30 дней) ─────────
+        $monthStart = $today->copy()->subDays(29)->startOfDay();
+        $topServicesRaw = Appointment::with('service')
+            ->where('status', AppointmentStatus::Completed)
+            ->whereBetween('starts_at', [$monthStart, now()])
+            ->whereNotNull('service_id')
+            ->selectRaw('service_id, COUNT(*) as cnt, SUM(price) as revenue')
+            ->groupBy('service_id')
+            ->orderByDesc('cnt')
+            ->limit(5)
+            ->get();
+
+        $topServicesMax = max(1, $topServicesRaw->max('cnt'));
+
+        $topServices = $topServicesRaw->map(fn ($row) => [
+            'name' => $row->service?->name ?? '—',
+            'cnt' => (int) $row->cnt,
+            'revenue' => (float) $row->revenue,
+            'barPct' => round($row->cnt / $topServicesMax * 100),
+        ]);
+
+        // ── Ближайшие записи (сегодня + завтра, статус planned) ──────────
+        $upcomingAppointments = Appointment::with(['client', 'staff', 'service'])
+            ->where('status', AppointmentStatus::Planned)
+            ->whereBetween('starts_at', [now(), $today->copy()->addDay()->endOfDay()])
+            ->orderBy('starts_at')
+            ->limit(8)
+            ->get();
 
         // ── Сегодняшние записи ────────────────────────────────────────────
         $todayAppointments = Appointment::with(['client', 'staff', 'service'])
@@ -135,6 +165,8 @@ class Index extends Component
             'sparkRevenue',
             'donut',
             'staffStats',
+            'topServices',
+            'upcomingAppointments',
             'todayAppointments',
         ));
     }
