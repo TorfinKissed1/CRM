@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="CRM для барбершопа — клиенты, расписание и финансы в одном месте. Laravel 12 + Livewire.">
+  <title>CRM для барбершопа</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #0d0a1a;
+      --surface:     #16122b;
+      --surface2:    #1e1a36;
+      --border:      #2a2350;
+      --text:        #ece9f7;
+      --muted:       #a79fc6;
+      --accent:      #8b5cf6;
+      --accent2:     #c084fc;
+      --grad-start:  #c084fc;
+      --grad-end:    #6a40c9;
+      --cyan:        #22d3ee;
+      --green:       #34d399;
+      --red:         #f87171;
+      --radius:      14px;
+      --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Stars background ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 40% at 20% 10%, rgba(139,92,246,.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 35% at 80% 15%, rgba(192,132,252,.09) 0%, transparent 65%),
+        radial-gradient(ellipse 40% 30% at 60% 80%, rgba(106,64,201,.10) 0%, transparent 60%),
+        radial-gradient(ellipse 30% 20% at 10% 70%, rgba(34,211,238,.05) 0%, transparent 55%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Tiny star dots */
+    body::after {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        radial-gradient(1px 1px at  8%  12%, rgba(236,233,247,.55) 0%, transparent 100%),
+        radial-gradient(1px 1px at 22%   5%, rgba(236,233,247,.40) 0%, transparent 100%),
+        radial-gradient(1px 1px at 45%  18%, rgba(192,132,252,.60) 0%, transparent 100%),
+        radial-gradient(1px 1px at 67%   8%, rgba(236,233,247,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 85%  22%, rgba(236,233,247,.50) 0%, transparent 100%),
+        radial-gradient(1px 1px at 92%   5%, rgba(192,132,252,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 15%  35%, rgba(236,233,247,.30) 0%, transparent 100%),
+        radial-gradient(1px 1px at 55%  42%, rgba(34,211,238,.40)  0%, transparent 100%),
+        radial-gradient(1px 1px at 78%  38%, rgba(236,233,247,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 35%  55%, rgba(192,132,252,.30) 0%, transparent 100%),
+        radial-gradient(1px 1px at  3%  62%, rgba(236,233,247,.45) 0%, transparent 100%),
+        radial-gradient(1px 1px at 88%  68%, rgba(236,233,247,.40) 0%, transparent 100%),
+        radial-gradient(1px 1px at 50%  75%, rgba(236,233,247,.30) 0%, transparent 100%),
+        radial-gradient(1px 1px at 25%  82%, rgba(192,132,252,.35) 0%, transparent 100%),
+        radial-gradient(1px 1px at 70%  88%, rgba(236,233,247,.25) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 40% 25%, rgba(139,92,246,.50) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 95% 50%, rgba(34,211,238,.35) 0%, transparent 100%),
+        radial-gradient(1.5px 1.5px at 12% 90%, rgba(139,92,246,.40) 0%, transparent 100%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* ── Layout wrappers ── */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ── HEADER ── */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13,10,26,.82);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .logo-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo-sub {
+      font-size: .68rem;
+      color: var(--muted);
+      letter-spacing: .04em;
+      text-transform: uppercase;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .gh-link {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: .85rem;
+      font-weight: 500;
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 8px;
+      transition: color .2s, border-color .2s, background .2s;
+    }
+
+    .gh-link:hover {
+      color: var(--text);
+      border-color: var(--accent);
+      background: rgba(139,92,246,.08);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 96px 0 80px;
+      text-align: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--accent2);
+      background: rgba(139,92,246,.12);
+      border: 1px solid rgba(139,92,246,.30);
+      border-radius: 100px;
+      padding: 5px 14px;
+      margin-bottom: 28px;
+    }
+
+    .hero-badge::before {
+      content: '';
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent2);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: .5; transform: scale(.7); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.2rem, 5vw, 3.6rem);
+      font-weight: 800;
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 20px;
+    }
+
+    .hero h1 .grad {
+      background: linear-gradient(135deg, var(--grad-start) 20%, var(--grad-end) 80%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-desc {
+      font-size: 1.15rem;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 36px;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, var(--grad-start), var(--grad-end));
+      color: #fff;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: .95rem;
+      padding: 14px 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 24px rgba(139,92,246,.35);
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(139,92,246,.5);
+    }
+
+    /* ── DASHBOARD MOCK ── */
+    .dashboard-section {
+      padding: 0 0 88px;
+    }
+
+    .dashboard-frame {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 8px 48px rgba(0,0,0,.5), 0 0 0 1px rgba(139,92,246,.08);
+    }
+
+    /* Top bar of the mock dashboard */
+    .db-topbar {
+      background: #110e24;
+      border-bottom: 1px solid var(--border);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .db-dots { display: flex; gap: 6px; }
+
+    .db-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+    }
+
+    .db-dot-r { background: #f87171; }
+    .db-dot-y { background: #fbbf24; }
+    .db-dot-g { background: #34d399; }
+
+    .db-url-bar {
+      flex: 1;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      height: 24px;
+      max-width: 340px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      padding: 0 10px;
+      gap: 6px;
+    }
+
+    .db-url-text {
+      font-size: .65rem;
+      color: var(--muted);
+      opacity: .7;
+    }
+
+    /* Dashboard sidebar + content */
+    .db-body {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      min-height: 480px;
+    }
+
+    .db-sidebar {
+      background: #0f0c22;
+      border-right: 1px solid var(--border);
+      padding: 20px 0;
+    }
+
+    .db-nav-logo {
+      padding: 0 16px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: .85rem;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 12px;
+    }
+
+    .db-nav-item {
+      padding: 9px 16px;
+      font-size: .78rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      cursor: default;
+      transition: background .15s, color .15s;
+      border-radius: 0;
+    }
+
+    .db-nav-item.active {
+      color: var(--text);
+      background: rgba(139,92,246,.14);
+      border-right: 2px solid var(--accent);
+    }
+
+    .db-nav-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+      flex-shrink: 0;
+    }
+
+    /* Dashboard main content */
+    .db-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .db-content-title {
+      font-size: .9rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .db-kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .kpi-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .kpi-label {
+      font-size: .65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 6px;
+    }
+
+    .kpi-val {
+      font-size: 1.3rem;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .kpi-val.purple { color: var(--accent2); }
+    .kpi-val.cyan   { color: var(--cyan); }
+    .kpi-val.green  { color: var(--green); }
+    .kpi-val.white  { color: var(--text); }
+
+    .kpi-trend {
+      font-size: .68rem;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .trend-up   { color: var(--green); }
+    .trend-down { color: var(--red); }
+
+    /* Mini charts row */
+    .db-charts-row {
+      display: grid;
+      grid-template-columns: 1fr 200px;
+      gap: 12px;
+    }
+
+    .chart-card {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+    }
+
+    .chart-title {
+      font-size: .7rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .06em;
+      margin-bottom: 10px;
+    }
+
+    /* ── FEATURES ── */
+    .features-section {
+      padding: 0 0 88px;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(1.5rem, 3.5vw, 2.2rem);
+      font-weight: 800;
+      letter-spacing: -.02em;
+      margin-bottom: 12px;
+    }
+
+    .section-desc {
+      text-align: center;
+      color: var(--muted);
+      font-size: .95rem;
+      max-width: 480px;
+      margin: 0 auto 48px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .feat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 26px 22px;
+      transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+
+    .feat-card:hover {
+      border-color: rgba(139,92,246,.5);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 32px rgba(0,0,0,.3);
+    }
+
+    .feat-icon {
+      width: 44px; height: 44px;
+      background: rgba(139,92,246,.14);
+      border: 1px solid rgba(139,92,246,.25);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .feat-title {
+      font-size: .95rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .feat-desc {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── STACK ── */
+    .stack-section {
+      padding: 0 0 88px;
+    }
+
+    .stack-bar {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .stack-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--text);
+      transition: border-color .2s;
+    }
+
+    .stack-badge:hover {
+      border-color: var(--accent);
+    }
+
+    .stack-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .stack-sep {
+      color: var(--border);
+      font-size: 1.2rem;
+      line-height: 1;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 0;
+    }
+
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .footer-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .footer-copy {
+      font-size: .8rem;
+      color: var(--muted);
+    }
+
+    .footer-right a {
+      color: var(--accent);
+      text-decoration: none;
+      font-size: .82rem;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .footer-right a:hover { color: var(--accent2); }
+
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
+      .db-body { grid-template-columns: 1fr; }
+      .db-sidebar { display: none; }
+      .db-kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .db-charts-row { grid-template-columns: 1fr; }
+      .features-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (max-width: 560px) {
+      .hero { padding: 64px 0 56px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .db-kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .header-inner .logo-sub { display: none; }
+      .stack-bar { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════ HEADER ═══════ -->
+<header>
+  <div class="wrap">
+    <div class="header-inner">
+      <a class="logo" href="#">
+        <!-- Inline logo SVG: crescent + star -->
+        <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <defs>
+            <linearGradient id="hdrGrad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#c084fc"/>
+              <stop offset="100%" stop-color="#6a40c9"/>
+            </linearGradient>
+          </defs>
+          <circle cx="18" cy="18" r="18" fill="rgba(139,92,246,.12)"/>
+          <!-- Crescent moon -->
+          <path d="M22 10a9 9 0 1 0 0 16 7 7 0 1 1 0-16Z" fill="url(#hdrGrad)"/>
+          <!-- Star -->
+          <path d="M25.5 9l.62 1.91h2.01l-1.63 1.18.62 1.91-1.62-1.18-1.63 1.18.63-1.91-1.63-1.18h2.01Z" fill="#c084fc"/>
+        </svg>
+        <div class="logo-text">
+          <span class="logo-title">CRM</span>
+          <span class="logo-sub">для барбершопа</span>
+        </div>
+      </a>
+      <div class="header-right">
+        <a class="gh-link" href="https://github.com/TorfinKissed1/CRM" target="_blank" rel="noopener">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+          </svg>
+          GitHub
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════ HERO ═══════ -->
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-badge">Боевой продукт · v1.0</div>
+    <h1>
+      CRM для<br>
+      <span class="grad">барбершопа</span>
+    </h1>
+    <p class="hero-desc">
+      Клиенты, расписание и финансы — в одном месте.<br>
+      Тёмный дашборд, SVG-графики, роли и аналитика.
+    </p>
+    <a class="btn-primary" href="https://github.com/TorfinKissed1/CRM" target="_blank" rel="noopener">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+        <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+      </svg>
+      Смотреть на GitHub
+    </a>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ DASHBOARD MOCK ═══════ -->
+<section class="dashboard-section">
+  <div class="wrap">
+    <div class="dashboard-frame">
+      <!-- Browser chrome bar -->
+      <div class="db-topbar">
+        <div class="db-dots">
+          <div class="db-dot db-dot-r"></div>
+          <div class="db-dot db-dot-y"></div>
+          <div class="db-dot db-dot-g"></div>
+        </div>
+        <div class="db-url-bar">
+          <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden="true">
+            <path d="M6 1a5 5 0 1 0 0 10A5 5 0 0 0 6 1ZM2 6a4 4 0 1 1 8 0 4 4 0 0 1-8 0Z" fill="#34d399"/>
+          </svg>
+          <span class="db-url-text">crm.barbershop.local / dashboard</span>
+        </div>
+      </div>
+
+      <!-- Dashboard body -->
+      <div class="db-body">
+        <!-- Sidebar -->
+        <aside class="db-sidebar">
+          <div class="db-nav-logo">
+            <svg width="20" height="20" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="sbGrad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                  <stop offset="0%" stop-color="#c084fc"/>
+                  <stop offset="100%" stop-color="#6a40c9"/>
+                </linearGradient>
+              </defs>
+              <path d="M22 10a9 9 0 1 0 0 16 7 7 0 1 1 0-16Z" fill="url(#sbGrad)"/>
+              <path d="M25.5 9l.62 1.91h2.01l-1.63 1.18.62 1.91-1.62-1.18-1.63 1.18.63-1.91-1.63-1.18h2.01Z" fill="#c084fc"/>
+            </svg>
+            CRM
+          </div>
+          <div class="db-nav-item active">
+            <div class="db-nav-dot" style="background:var(--accent)"></div>
+            Дашборд
+          </div>
+          <div class="db-nav-item">
+            <div class="db-nav-dot"></div>
+            Клиенты
+          </div>
+          <div class="db-nav-item">
+            <div class="db-nav-dot"></div>
+            Расписание
+          </div>
+          <div class="db-nav-item">
+            <div class="db-nav-dot"></div>
+            Финансы
+          </div>
+          <div class="db-nav-item">
+            <div class="db-nav-dot"></div>
+            Отчёты
+          </div>
+          <div class="db-nav-item">
+            <div class="db-nav-dot"></div>
+            Настройки
+          </div>
+        </aside>
+
+        <!-- Content -->
+        <main class="db-content">
+          <div class="db-content-title">Обзор · Июнь 2026</div>
+
+          <!-- KPI row -->
+          <div class="db-kpi-row">
+            <div class="kpi-card">
+              <div class="kpi-label">Записей за месяц</div>
+              <div class="kpi-val purple">347</div>
+              <div class="kpi-trend trend-up">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 2 9 7H1L5 2Z" fill="currentColor"/></svg>
+                +18% к маю
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Выручка, ₽</div>
+              <div class="kpi-val cyan">412 800</div>
+              <div class="kpi-trend trend-up">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 2 9 7H1L5 2Z" fill="currentColor"/></svg>
+                +23% к маю
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Средний чек, ₽</div>
+              <div class="kpi-val green">1 189</div>
+              <div class="kpi-trend trend-up">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 2 9 7H1L5 2Z" fill="currentColor"/></svg>
+                +4% к маю
+              </div>
+            </div>
+            <div class="kpi-card">
+              <div class="kpi-label">Активных клиентов</div>
+              <div class="kpi-val white">214</div>
+              <div class="kpi-trend trend-up">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden="true"><path d="M5 2 9 7H1L5 2Z" fill="currentColor"/></svg>
+                +9 новых
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts row -->
+          <div class="db-charts-row">
+            <!-- Bar chart: Записи по дням -->
+            <div class="chart-card">
+              <div class="chart-title">Записи по дням (Июнь)</div>
+              <svg viewBox="0 0 380 110" width="100%" height="110" xmlns="http://www.w3.org/2000/svg" aria-label="График записей по дням">
+                <defs>
+                  <linearGradient id="barGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#c084fc"/>
+                    <stop offset="100%" stop-color="#6a40c9"/>
+                  </linearGradient>
+                  <linearGradient id="barGrad2" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#22d3ee"/>
+                    <stop offset="100%" stop-color="#0e8fa3"/>
+                  </linearGradient>
+                </defs>
+                <!-- Grid lines -->
+                <line x1="0" y1="25"  x2="380" y2="25"  stroke="#2a2350" stroke-width=".5"/>
+                <line x1="0" y1="50"  x2="380" y2="50"  stroke="#2a2350" stroke-width=".5"/>
+                <line x1="0" y1="75"  x2="380" y2="75"  stroke="#2a2350" stroke-width=".5"/>
+                <line x1="0" y1="100" x2="380" y2="100" stroke="#2a2350" stroke-width=".5"/>
+                <!-- Y labels -->
+                <text x="2" y="24"  font-size="7" fill="#6b5f8e">20</text>
+                <text x="2" y="49"  font-size="7" fill="#6b5f8e">15</text>
+                <text x="2" y="74"  font-size="7" fill="#6b5f8e">10</text>
+                <text x="2" y="99"  font-size="7" fill="#6b5f8e">5</text>
+                <!-- Bars: heights scaled, 5 units = 25px, each bar w=14, gap=4, offset left=18 -->
+                <!-- Data (approx days): 11,8,14,17,12,9,16,18,13,7,11,15,19,10,8,14,16,11,9,13,17,15,12,8,11,14,18,13,7 -->
+                <rect x="18"  y="47" width="8" height="53" rx="2" fill="url(#barGrad)" opacity=".85"/>
+                <rect x="30"  y="60" width="8" height="40" rx="2" fill="url(#barGrad)" opacity=".75"/>
+                <rect x="42"  y="30" width="8" height="70" rx="2" fill="url(#barGrad2)" opacity=".85"/>
+                <rect x="54"  y="15" width="8" height="85" rx="2" fill="url(#barGrad2)" opacity=".90"/>
+                <rect x="66"  y="40" width="8" height="60" rx="2" fill="url(#barGrad)" opacity=".80"/>
+                <rect x="78"  y="55" width="8" height="45" rx="2" fill="url(#barGrad)" opacity=".75"/>
+                <rect x="90"  y="20" width="8" height="80" rx="2" fill="url(#barGrad2)" opacity=".88"/>
+                <rect x="102" y="10" width="8" height="90" rx="2" fill="url(#barGrad2)" opacity=".92"/>
+                <rect x="114" y="35" width="8" height="65" rx="2" fill="url(#barGrad)" opacity=".82"/>
+                <rect x="126" y="65" width="8" height="35" rx="2" fill="url(#barGrad)" opacity=".70"/>
+                <rect x="138" y="47" width="8" height="53" rx="2" fill="url(#barGrad)" opacity=".80"/>
+                <rect x="150" y="25" width="8" height="75" rx="2" fill="url(#barGrad2)" opacity=".88"/>
+                <rect x="162" y="5"  width="8" height="95" rx="2" fill="url(#barGrad2)" opacity=".95"/>
+                <rect x="174" y="50" width="8" height="50" rx="2" fill="url(#barGrad)" opacity=".80"/>
+                <rect x="186" y="60" width="8" height="40" rx="2" fill="url(#barGrad)" opacity=".75"/>
+                <rect x="198" y="30" width="8" height="70" rx="2" fill="url(#barGrad2)" opacity=".85"/>
+                <rect x="210" y="20" width="8" height="80" rx="2" fill="url(#barGrad2)" opacity=".90"/>
+                <rect x="222" y="47" width="8" height="53" rx="2" fill="url(#barGrad)" opacity=".80"/>
+                <rect x="234" y="55" width="8" height="45" rx="2" fill="url(#barGrad)" opacity=".76"/>
+                <rect x="246" y="35" width="8" height="65" rx="2" fill="url(#barGrad)" opacity=".82"/>
+                <rect x="258" y="15" width="8" height="85" rx="2" fill="url(#barGrad2)" opacity=".90"/>
+                <rect x="270" y="25" width="8" height="75" rx="2" fill="url(#barGrad2)" opacity=".87"/>
+                <rect x="282" y="40" width="8" height="60" rx="2" fill="url(#barGrad)" opacity=".80"/>
+                <rect x="294" y="60" width="8" height="40" rx="2" fill="url(#barGrad)" opacity=".74"/>
+                <rect x="306" y="47" width="8" height="53" rx="2" fill="url(#barGrad)" opacity=".80"/>
+                <rect x="318" y="30" width="8" height="70" rx="2" fill="url(#barGrad2)" opacity=".86"/>
+                <rect x="330" y="10" width="8" height="90" rx="2" fill="url(#barGrad2)" opacity=".92"/>
+                <rect x="342" y="35" width="8" height="65" rx="2" fill="url(#barGrad)" opacity=".82"/>
+                <rect x="354" y="65" width="8" height="35" rx="2" fill="url(#barGrad)" opacity=".72"/>
+                <!-- X labels (every 5th day) -->
+                <text x="18"  y="109" font-size="7" fill="#6b5f8e">1</text>
+                <text x="66"  y="109" font-size="7" fill="#6b5f8e">5</text>
+                <text x="114" y="109" font-size="7" fill="#6b5f8e">10</text>
+                <text x="162" y="109" font-size="7" fill="#6b5f8e">15</text>
+                <text x="210" y="109" font-size="7" fill="#6b5f8e">20</text>
+                <text x="258" y="109" font-size="7" fill="#6b5f8e">25</text>
+                <text x="330" y="109" font-size="7" fill="#6b5f8e">27</text>
+              </svg>
+            </div>
+
+            <!-- Donut chart: Статусы -->
+            <div class="chart-card">
+              <div class="chart-title">Статусы записей</div>
+              <svg viewBox="0 0 200 110" width="100%" height="110" xmlns="http://www.w3.org/2000/svg" aria-label="Диаграмма статусов записей">
+                <!-- Donut: center 70,55 r=38 stroke-width=20 -->
+                <!-- Total segments: завершено 62%, активно 24%, отменено 14% -->
+                <!-- Circumference = 2π×38 ≈ 238.76 -->
+                <!-- Segment 1: завершено 62% → dasharray= 148.03 90.73, start at -90deg (rotate -90) -->
+                <!-- Segment 2: активно 24% → 57.30 -->
+                <!-- Segment 3: отменено 14% → 33.43 -->
+                <circle cx="70" cy="55" r="38" fill="none" stroke="#1e1a36" stroke-width="22"/>
+                <!-- завершено -->
+                <circle cx="70" cy="55" r="38" fill="none"
+                  stroke="#8b5cf6" stroke-width="19"
+                  stroke-dasharray="148 91"
+                  stroke-dashoffset="60"
+                  stroke-linecap="round"/>
+                <!-- активно -->
+                <circle cx="70" cy="55" r="38" fill="none"
+                  stroke="#22d3ee" stroke-width="19"
+                  stroke-dasharray="57 182"
+                  stroke-dashoffset="-88"
+                  stroke-linecap="round"/>
+                <!-- отменено -->
+                <circle cx="70" cy="55" r="38" fill="none"
+                  stroke="#f87171" stroke-width="19"
+                  stroke-dasharray="33 206"
+                  stroke-dashoffset="-145"
+                  stroke-linecap="round"/>
+                <!-- Center text -->
+                <text x="70" y="51" text-anchor="middle" font-size="14" font-weight="800" fill="#ece9f7">347</text>
+                <text x="70" y="63" text-anchor="middle" font-size="7"  fill="#a79fc6">записей</text>
+                <!-- Legend -->
+                <rect x="120" y="22" width="7" height="7" rx="2" fill="#8b5cf6"/>
+                <text x="130" y="29" font-size="8" fill="#a79fc6">Завершено</text>
+                <text x="130" y="39" font-size="9" font-weight="700" fill="#ece9f7">62%</text>
+
+                <rect x="120" y="52" width="7" height="7" rx="2" fill="#22d3ee"/>
+                <text x="130" y="59" font-size="8" fill="#a79fc6">Активно</text>
+                <text x="130" y="69" font-size="9" font-weight="700" fill="#ece9f7">24%</text>
+
+                <rect x="120" y="82" width="7" height="7" rx="2" fill="#f87171"/>
+                <text x="130" y="89" font-size="8" fill="#a79fc6">Отменено</text>
+                <text x="130" y="99" font-size="9" font-weight="700" fill="#ece9f7">14%</text>
+              </svg>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ FEATURES ═══════ -->
+<section class="features-section">
+  <div class="wrap">
+    <div class="section-label">Возможности</div>
+    <h2 class="section-title">Всё необходимое для работы</h2>
+    <p class="section-desc">Продуманный инструмент для ежедневной работы барбершопа — без лишнего.</p>
+
+    <div class="features-grid">
+
+      <!-- Дашборд -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="2" y="2" width="9" height="9" rx="2"/>
+            <rect x="13" y="2" width="9" height="9" rx="2"/>
+            <rect x="13" y="13" width="9" height="9" rx="2"/>
+            <rect x="2" y="13" width="9" height="9" rx="2"/>
+          </svg>
+        </div>
+        <div class="feat-title">Дашборд и аналитика</div>
+        <div class="feat-desc">KPI в реальном времени, SVG-графики записей и выручки, тренды по периодам. Всё на одном экране.</div>
+      </div>
+
+      <!-- Клиенты -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+        </div>
+        <div class="feat-title">База клиентов</div>
+        <div class="feat-desc">Быстрый поиск, история визитов, мессенджеры. Импорт и экспорт в xlsx/csv без лишних шагов.</div>
+      </div>
+
+      <!-- Расписание -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8"  y1="2" x2="8"  y2="6"/>
+            <line x1="3"  y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="feat-title">Расписание мастеров</div>
+        <div class="feat-desc">Канбан-борд по мастерам, наглядные статусы, перетаскивание записей. Просмотр по дню и неделе.</div>
+      </div>
+
+      <!-- Финансы -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="12" y1="1" x2="12" y2="23"/>
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+          </svg>
+        </div>
+        <div class="feat-title">Финансы</div>
+        <div class="feat-desc">Доходы и расходы, средний чек, прибыль по мастерам. Динамика выручки за любой период.</div>
+      </div>
+
+      <!-- Темы -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="5"/>
+            <line x1="12" y1="1"  x2="12" y2="3"/>
+            <line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22"  y1="4.22"  x2="5.64"  y2="5.64"/>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1"  y1="12" x2="3"  y2="12"/>
+            <line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22"  y1="19.78" x2="5.64"  y2="18.36"/>
+            <line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"/>
+          </svg>
+        </div>
+        <div class="feat-title">Тёмная и светлая тема</div>
+        <div class="feat-desc">Переключение в один клик. Система тем реализована через CSS-переменные, без мигания при загрузке.</div>
+      </div>
+
+      <!-- Роли -->
+      <div class="feat-card">
+        <div class="feat-icon">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c084fc" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10Z"/>
+          </svg>
+        </div>
+        <div class="feat-title">Роли и доступы</div>
+        <div class="feat-desc">Владелец, менеджер, мастер — у каждого своя область видимости и набор действий. Гибко и безопасно.</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ STACK ═══════ -->
+<section class="stack-section">
+  <div class="wrap">
+    <div class="section-label">Технологии</div>
+    <h2 class="section-title" style="margin-bottom:32px;">Стек</h2>
+    <div class="stack-bar">
+      <div class="stack-badge">
+        <div class="stack-dot" style="background:#f9322c;"></div>
+        Laravel 12
+      </div>
+      <div class="stack-sep">·</div>
+      <div class="stack-badge">
+        <div class="stack-dot" style="background:#fb70a9;"></div>
+        Livewire 4
+      </div>
+      <div class="stack-sep">·</div>
+      <div class="stack-badge">
+        <div class="stack-dot" style="background:#77c1d2;"></div>
+        Alpine.js
+      </div>
+      <div class="stack-sep">·</div>
+      <div class="stack-badge">
+        <div class="stack-dot" style="background:#336791;"></div>
+        PostgreSQL
+      </div>
+      <div class="stack-sep">·</div>
+      <div class="stack-badge">
+        <div class="stack-dot" style="background:#c084fc;"></div>
+        SCSS / БЭМ
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════ FOOTER ═══════ -->
+<footer>
+  <div class="wrap">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <svg width="24" height="24" viewBox="0 0 36 36" fill="none" aria-hidden="true">
+          <defs>
+            <linearGradient id="ftGrad" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+              <stop offset="0%" stop-color="#c084fc"/>
+              <stop offset="100%" stop-color="#6a40c9"/>
+            </linearGradient>
+          </defs>
+          <path d="M22 10a9 9 0 1 0 0 16 7 7 0 1 1 0-16Z" fill="url(#ftGrad)"/>
+          <path d="M25.5 9l.62 1.91h2.01l-1.63 1.18.62 1.91-1.62-1.18-1.63 1.18.63-1.91-1.63-1.18h2.01Z" fill="#c084fc"/>
+        </svg>
+        <span class="footer-copy">CRM для барбершопа &nbsp;·&nbsp; 2026 &nbsp;·&nbsp; Наш боевой продукт</span>
+      </div>
+      <div class="footer-right">
+        <a href="https://github.com/TorfinKissed1/CRM" target="_blank" rel="noopener">
+          <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
+            <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/>
+          </svg>
+          TorfinKissed1/CRM
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
