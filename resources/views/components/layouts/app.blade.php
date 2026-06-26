@@ -20,7 +20,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $pageTitle }} · {{ Crm::businessName() }}</title>
-    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+    <script>
+(function () {
+    function applyTheme() {
+        try {
+            var t = localStorage.getItem('theme');
+            if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+            else document.documentElement.removeAttribute('data-theme');
+        } catch (e) {}
+    }
+    applyTheme();
+    document.addEventListener('livewire:navigated', applyTheme);
+})();
+</script>
     @livewireStyles
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
@@ -76,7 +88,7 @@
                 <div class="topbar__right">
                     <span class="topbar__date">{{ Carbon::now()->isoFormat('dddd, D MMMM') }}</span>
                     <button type="button" class="theme-toggle" aria-label="Сменить тему" title="Сменить тему"
-                            onclick="(function(){var r=document.documentElement;var t=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',t);try{localStorage.setItem('theme',t);}catch(e){}})()">
+                            onclick="(function(){var r=document.documentElement;var isLight=r.getAttribute('data-theme')==='light';if(isLight){r.removeAttribute('data-theme');try{localStorage.setItem('theme','dark');}catch(e){}}else{r.setAttribute('data-theme','light');try{localStorage.setItem('theme','light');}catch(e){}}})()">
                         <span class="theme-toggle__sun">@include('partials.icons', ['name' => 'sun'])</span>
                         <span class="theme-toggle__moon">@include('partials.icons', ['name' => 'moon'])</span>
                     </button>

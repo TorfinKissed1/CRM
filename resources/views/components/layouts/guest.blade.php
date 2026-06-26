@@ -5,7 +5,19 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? Crm::businessName() }}</title>
-    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
+    <script>
+(function () {
+    function applyTheme() {
+        try {
+            var t = localStorage.getItem('theme');
+            if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+            else document.documentElement.removeAttribute('data-theme');
+        } catch (e) {}
+    }
+    applyTheme();
+    document.addEventListener('livewire:navigated', applyTheme);
+})();
+</script>
     @livewireStyles
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>

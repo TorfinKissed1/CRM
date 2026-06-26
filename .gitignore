@@ -37,3 +37,8 @@ Thumbs.db
 
 # Dev-роутер встроенного сервера (локально)
 /router.php
+
+# Временные тест-скрипты
+/scratch_*.cjs
+/scratch_*.mjs
+/scratch_*.js
