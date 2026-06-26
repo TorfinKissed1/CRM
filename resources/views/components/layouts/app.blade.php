@@ -20,6 +20,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $pageTitle }} · {{ Crm::businessName() }}</title>
+    <script>(function(){try{var t=localStorage.getItem('theme');if(t==='light'||t==='dark'){document.documentElement.setAttribute('data-theme',t);}}catch(e){}})();</script>
     @livewireStyles
     @vite(['resources/scss/app.scss', 'resources/js/app.js'])
 </head>
@@ -72,7 +73,14 @@
         <div class="app-main">
             <header class="topbar">
                 <h1 class="topbar__title">{{ $pageTitle }}</h1>
-                <div class="topbar__date">{{ Carbon::now()->isoFormat('dddd, D MMMM') }}</div>
+                <div class="topbar__right">
+                    <span class="topbar__date">{{ Carbon::now()->isoFormat('dddd, D MMMM') }}</span>
+                    <button type="button" class="theme-toggle" aria-label="Сменить тему" title="Сменить тему"
+                            onclick="(function(){var r=document.documentElement;var t=r.getAttribute('data-theme')==='light'?'dark':'light';r.setAttribute('data-theme',t);try{localStorage.setItem('theme',t);}catch(e){}})()">
+                        <span class="theme-toggle__sun">@include('partials.icons', ['name' => 'sun'])</span>
+                        <span class="theme-toggle__moon">@include('partials.icons', ['name' => 'moon'])</span>
+                    </button>
+                </div>
             </header>
 
             <main class="content">

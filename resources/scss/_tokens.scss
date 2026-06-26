@@ -69,3 +69,38 @@
     --topbar-height: 64px;
     --content-max: 1480px; // дашборд/контент шире, без пустоты справа
 }
+
+// --- Светлая тема (переключатель: html[data-theme='light']) — тоже фиолетовая ---
+:root[data-theme='light'] {
+    --color-primary: #7c4ddb;
+    --color-primary-600: #6a40c9;
+    --color-primary-700: #5a34ad;
+    --color-primary-050: #f0ebfb; // светлая фиолет-подложка active/hover/focus
+
+    --chart-1: #7c4ddb;
+    --chart-2: #0bb3a6;
+    --chart-3: #a855f7;
+    --chart-4: #e879c9;
+    --chart-5: #2f80ed;
+
+    --color-bg: #f4f2fb;
+    --color-surface: #ffffff;
+    --color-surface-2: #f6f4fc;
+    --color-border: #e7e3f3;
+    --color-text: #1d1830;
+    --color-text-muted: #5d5675;
+    --color-text-soft: #938caa;
+
+    --color-success: #0e9f6e;
+    --color-danger: #e02e4d;
+    --color-warning: #c2740a;
+    --color-info: #7c4ddb;
+    --color-up: #0e9f6e;
+    --color-down: #e02e4d;
+
+    --shadow-sm: 0 1px 3px rgba(16, 24, 40, .06), 0 1px 2px rgba(16, 24, 40, .04);
+    --shadow: 0 4px 16px rgba(16, 24, 40, .08);
+    --shadow-lg: 0 12px 32px rgba(16, 24, 40, .12);
+    --glow-primary: 0 0 0 3px rgba(124, 77, 219, .18);
+}
+

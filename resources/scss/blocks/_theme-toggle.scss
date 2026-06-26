@@ -1,0 +1,46 @@
+// Правый блок топбара + переключатель темы (тёмная/светлая).
+
+.topbar__right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.theme-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color .12s, background .12s, border-color .12s;
+
+    &:hover {
+        color: var(--color-primary);
+        border-color: var(--color-primary);
+        background: var(--color-primary-050);
+    }
+
+    &:focus-visible {
+        outline: none;
+        box-shadow: var(--glow-primary);
+    }
+
+    .icon {
+        width: 18px;
+        height: 18px;
+    }
+
+    // Тёмная тема (по умолчанию) — показываем солнце (клик → светлая)
+    &__moon { display: none; }
+}
+
+// Светлая тема — показываем месяц (клик → тёмная)
+:root[data-theme='light'] {
+    .theme-toggle__sun { display: none; }
+    .theme-toggle__moon { display: inline-flex; }
+}
