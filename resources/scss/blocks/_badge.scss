@@ -1,0 +1,64 @@
+// Бейджи статусов, чипы-теги и иконки мессенджеров.
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 10px;
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+
+    &--info {
+        background: var(--color-primary-050);
+        color: var(--color-primary-600);
+    }
+
+    &--success {
+        background: #e7f6ee;
+        color: var(--color-success);
+    }
+
+    &--warning {
+        background: #fdf0e1;
+        color: var(--color-warning);
+    }
+
+    &--muted {
+        background: var(--color-surface-2);
+        color: var(--color-text-soft);
+    }
+}
+
+.chip {
+    display: inline-flex;
+    padding: 2px 9px;
+    border-radius: var(--radius-pill);
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    font-size: var(--fs-xs);
+}
+
+.messengers {
+    display: inline-flex;
+    gap: 6px;
+}
+
+.messenger {
+    display: inline-grid;
+    place-items: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+    background: var(--color-surface-2);
+    color: var(--color-text-muted);
+    font-size: 11px;
+    font-weight: 700;
+
+    &--vk { background: #e6effa; color: #2787f5; }
+    &--tg { background: #e6f3fb; color: #2aabee; }
+    &--ig { background: #fdeef3; color: #c13584; }
+    &--wa { background: #e8f8ee; color: #25d366; }
+}
