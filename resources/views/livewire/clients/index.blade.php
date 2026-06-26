@@ -55,9 +55,13 @@
                             <td>{{ $client->preferredStaff?->name ?: '—' }}</td>
                             <td>
                                 <div class="table__actions">
-                                    <button class="btn btn--ghost btn--sm" wire:click="edit({{ $client->id }})">Правка</button>
+                                    <button class="btn btn--ghost btn--sm" wire:click="edit({{ $client->id }})">
+                                        @include('partials.icons', ['name' => 'edit']) Правка
+                                    </button>
                                     <button class="btn btn--ghost btn--sm" wire:click="delete({{ $client->id }})"
-                                            wire:confirm="Удалить «{{ $client->name }}»?">Удалить</button>
+                                            wire:confirm="Удалить «{{ $client->name }}»?">
+                                        @include('partials.icons', ['name' => 'trash']) Удалить
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -65,6 +69,7 @@
                         <tr>
                             <td colspan="6">
                                 <div class="empty">
+                                    <div class="empty__icon">@include('partials.icons', ['name' => 'users'])</div>
                                     <div class="empty__title">{{ mb_strtolower(Crm::label('clients')) }} пока нет</div>
                                     <p>Добавьте вручную или импортируйте из xlsx/csv.</p>
                                 </div>
