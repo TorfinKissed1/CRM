@@ -3,8 +3,11 @@
 namespace Tests\Feature;
 
 use App\Enums\Role;
+use App\Livewire\Settings\Index as SettingsPage;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Livewire;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 use Tests\TestCase;
 
 class SmokeTest extends TestCase
@@ -43,6 +46,18 @@ class SmokeTest extends TestCase
 
         $this->get('/dashboard')->assertOk();
         $this->get('/settings')->assertForbidden();
+    }
+
+    public function test_manager_cannot_invoke_settings_component(): void
+    {
+        // Защита от обхода route-middleware прямым вызовом Livewire-метода.
+        $this->actingAs($this->user(Role::Manager));
+
+        try {
+            Livewire::test(SettingsPage::class)->assertForbidden();
+        } catch (HttpException $e) {
+            $this->assertSame(403, $e->getStatusCode());
+        }
     }
 
     public function test_disabled_user_cannot_log_in(): void

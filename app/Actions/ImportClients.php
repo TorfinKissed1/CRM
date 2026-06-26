@@ -36,6 +36,26 @@ class ImportClients
         return new XlsxReader;
     }
 
+    /** Нормализация телефона к +7XXXXXXXXXX для консистентного дедупа. */
+    private function normalizePhone(string $raw): string
+    {
+        $digits = preg_replace('/\D+/', '', $raw) ?? '';
+        if ($digits === '') {
+            return trim($raw);
+        }
+        if (strlen($digits) === 11 && $digits[0] === '8') {
+            $digits = '7'.substr($digits, 1);
+        }
+        if (strlen($digits) === 10) {
+            $digits = '7'.$digits;
+        }
+        if (strlen($digits) === 11 && $digits[0] === '7') {
+            return '+'.$digits;
+        }
+
+        return trim($raw);
+    }
+
     private function detectDelimiter(string $path): string
     {
         $line = '';
@@ -95,7 +115,14 @@ class ImportClients
                 $values = array_map(fn ($v) => is_scalar($v) ? trim((string) $v) : '', $row->toArray());
 
                 if ($i === 0) {
-                    $headerIndex = array_flip($values);
+                    // Позиционный маппинг: первое непустое вхождение заголовка побеждает
+                    // (array_flip ломается на дублях/пустых заголовках).
+                    foreach ($values as $idx => $header) {
+                        $header = trim($header);
+                        if ($header !== '' && ! array_key_exists($header, $headerIndex)) {
+                            $headerIndex[$header] = $idx;
+                        }
+                    }
                     $i++;
 
                     continue;
@@ -114,6 +141,10 @@ class ImportClients
 
                 if (empty($data['name'])) {
                     continue;
+                }
+
+                if (! empty($data['phone'])) {
+                    $data['phone'] = $this->normalizePhone($data['phone']);
                 }
 
                 $phone = $data['phone'] ?? null;

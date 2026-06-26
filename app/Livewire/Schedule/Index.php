@@ -9,6 +9,7 @@ use App\Models\Client;
 use App\Models\Service;
 use App\Models\Staff;
 use Illuminate\Support\Carbon;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -70,9 +71,9 @@ class Index extends Component
     {
         $data = $this->validate([
             'form.client_id' => 'nullable|exists:clients,id',
-            'form.staff_id' => 'required|exists:staff,id',
-            'form.service_id' => 'required|exists:services,id',
-            'form.time' => 'required',
+            'form.staff_id' => ['required', Rule::exists('staff', 'id')->where('is_active', true)],
+            'form.service_id' => ['required', Rule::exists('services', 'id')->where('is_active', true)],
+            'form.time' => 'required|date_format:H:i',
             'form.status' => 'required|in:planned,completed,no_show,cancelled',
             'form.notes' => 'nullable|string',
         ])['form'];
@@ -80,7 +81,7 @@ class Index extends Component
         $service = Service::find($data['service_id']);
         $starts = Carbon::parse($this->date.' '.$data['time']);
 
-        Appointment::updateOrCreate(['id' => $this->editingId], [
+        $payload = [
             'client_id' => $data['client_id'],
             'staff_id' => $data['staff_id'],
             'service_id' => $data['service_id'],
@@ -89,7 +90,11 @@ class Index extends Component
             'status' => $data['status'],
             'price' => $service?->price ?? 0,
             'notes' => $data['notes'] ?? null,
-        ]);
+        ];
+
+        $this->editingId
+            ? Appointment::findOrFail($this->editingId)->update($payload)
+            : Appointment::create($payload);
 
         $this->showForm = false;
         $this->dispatch('toast', message: 'Запись сохранена.');

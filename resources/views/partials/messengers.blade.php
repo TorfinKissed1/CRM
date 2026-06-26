@@ -1,10 +1,19 @@
-@php $ms = $client->messengers(); @endphp
-@if ($ms)
+@php
+    use Illuminate\Support\Str;
+
+    $ms = $client->messengers();
+    $mods = ['vk' => 'vk', 'telegram' => 'tg', 'instagram' => 'ig', 'whatsapp' => 'wa'];
+    $labels = ['vk' => 'VK', 'telegram' => 'TG', 'instagram' => 'IG', 'whatsapp' => 'WA'];
+    // Пропускаем только http(s)-ссылки — защита от javascript:/data: схем.
+    $safe = fn ($u) => Str::startsWith(strtolower(trim((string) $u)), ['http://', 'https://']) ? $u : null;
+    $links = collect($ms)->map($safe)->filter();
+@endphp
+@if ($links->isNotEmpty())
     <span class="messengers">
-        @isset($ms['vk'])<a href="{{ $ms['vk'] }}" target="_blank" rel="noopener" class="messenger messenger--vk" title="VK">VK</a>@endisset
-        @isset($ms['telegram'])<a href="{{ $ms['telegram'] }}" target="_blank" rel="noopener" class="messenger messenger--tg" title="Telegram">TG</a>@endisset
-        @isset($ms['instagram'])<a href="{{ $ms['instagram'] }}" target="_blank" rel="noopener" class="messenger messenger--ig" title="Instagram">IG</a>@endisset
-        @isset($ms['whatsapp'])<a href="{{ $ms['whatsapp'] }}" target="_blank" rel="noopener" class="messenger messenger--wa" title="WhatsApp">WA</a>@endisset
+        @foreach ($links as $type => $url)
+            <a href="{{ $url }}" target="_blank" rel="noopener noreferrer"
+               class="messenger messenger--{{ $mods[$type] ?? 'vk' }}" title="{{ $labels[$type] ?? $type }}">{{ $labels[$type] ?? $type }}</a>
+        @endforeach
     </span>
 @else
     <span class="table__muted">—</span>

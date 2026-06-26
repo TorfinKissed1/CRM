@@ -8,6 +8,7 @@ use App\Models\Setting;
 use App\Models\Staff;
 use App\Models\User;
 use App\Support\Crm;
+use Illuminate\Validation\Rule;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
@@ -36,8 +37,19 @@ class Index extends Component
 
     public ?int $userEditing = null;
 
+    /**
+     * Авторизация на уровне компонента: route-middleware `can:owner` защищает только
+     * первый GET, а каждый Livewire-метод — отдельный POST-эндпоинт. Поэтому проверяем
+     * владельца и в mount(), и в каждом методе записи/чтения.
+     */
+    protected function guardOwner(): void
+    {
+        abort_unless(auth()->user()?->isOwner(), 403);
+    }
+
     public function mount(): void
     {
+        $this->guardOwner();
         $this->businessName = Crm::businessName();
         $this->themePrimary = Crm::primaryColor();
         $this->currencySymbol = Crm::currencySymbol();
@@ -49,9 +61,11 @@ class Index extends Component
     // --- Профиль ---
     public function saveProfile(): void
     {
+        $this->guardOwner();
+
         $this->validate([
             'businessName' => 'required|string|max:120',
-            'themePrimary' => 'required|string|max:9',
+            'themePrimary' => 'required|regex:/^#[0-9a-fA-F]{3,8}$/',
             'currencySymbol' => 'required|string|max:8',
         ]);
 
@@ -65,27 +79,34 @@ class Index extends Component
     // --- Мастера ---
     public function saveStaff(): void
     {
+        $this->guardOwner();
+
         $data = $this->validate([
             'staffForm.name' => 'required|string|max:255',
             'staffForm.role_title' => 'nullable|string|max:255',
             'staffForm.specialization' => 'nullable|string|max:255',
-            'staffForm.color' => 'nullable|string|max:9',
+            'staffForm.color' => 'nullable|regex:/^#[0-9a-fA-F]{3,8}$/',
             'staffForm.is_active' => 'boolean',
         ])['staffForm'];
 
-        Staff::updateOrCreate(['id' => $this->staffEditing], $data);
+        $this->staffEditing
+            ? Staff::findOrFail($this->staffEditing)->update($data)
+            : Staff::create($data);
+
         $this->resetStaffForm();
         $this->dispatch('toast', message: 'Сохранено.');
     }
 
     public function editStaff(int $id): void
     {
+        $this->guardOwner();
         $this->staffEditing = $id;
         $this->staffForm = Staff::findOrFail($id)->only(['name', 'role_title', 'specialization', 'color', 'is_active']);
     }
 
     public function deleteStaff(int $id): void
     {
+        $this->guardOwner();
         Staff::findOrFail($id)->delete();
         $this->dispatch('toast', message: 'Удалено.');
     }
@@ -99,6 +120,8 @@ class Index extends Component
     // --- Услуги ---
     public function saveService(): void
     {
+        $this->guardOwner();
+
         $data = $this->validate([
             'serviceForm.name' => 'required|string|max:255',
             'serviceForm.category' => 'nullable|string|max:255',
@@ -107,19 +130,24 @@ class Index extends Component
             'serviceForm.is_active' => 'boolean',
         ])['serviceForm'];
 
-        Service::updateOrCreate(['id' => $this->serviceEditing], $data);
+        $this->serviceEditing
+            ? Service::findOrFail($this->serviceEditing)->update($data)
+            : Service::create($data);
+
         $this->resetServiceForm();
         $this->dispatch('toast', message: 'Сохранено.');
     }
 
     public function editService(int $id): void
     {
+        $this->guardOwner();
         $this->serviceEditing = $id;
         $this->serviceForm = Service::findOrFail($id)->only(['name', 'category', 'duration_min', 'price', 'is_active']);
     }
 
     public function deleteService(int $id): void
     {
+        $this->guardOwner();
         Service::findOrFail($id)->delete();
         $this->dispatch('toast', message: 'Удалено.');
     }
@@ -133,14 +161,27 @@ class Index extends Component
     // --- Пользователи ---
     public function saveUser(): void
     {
-        $rules = [
+        $this->guardOwner();
+
+        $data = $this->validate([
             'userForm.name' => 'required|string|max:255',
-            'userForm.email' => 'required|email|max:255',
+            'userForm.email' => ['required', 'email', 'max:255', Rule::unique('users', 'email')->ignore($this->userEditing)],
             'userForm.role' => 'required|in:owner,manager',
             'userForm.is_active' => 'boolean',
             'userForm.password' => ($this->userEditing ? 'nullable' : 'required').'|string|min:6',
-        ];
-        $data = $this->validate($rules)['userForm'];
+        ])['userForm'];
+
+        // Защита: нельзя снять роль/деактивировать единственного активного владельца.
+        if ($this->userEditing) {
+            $target = User::find($this->userEditing);
+            $isLastOwner = $target?->isOwner()
+                && User::where('role', Role::Owner)->where('is_active', true)->count() <= 1;
+            if ($isLastOwner && ($data['role'] !== 'owner' || ! $data['is_active'])) {
+                $this->addError('userForm.role', 'Это единственный владелец — нельзя снять роль или деактивировать.');
+
+                return;
+            }
+        }
 
         $payload = [
             'name' => $data['name'],
@@ -152,13 +193,17 @@ class Index extends Component
             $payload['password'] = $data['password']; // хэшируется кастом 'hashed'
         }
 
-        User::updateOrCreate(['id' => $this->userEditing], $payload);
+        $this->userEditing
+            ? User::findOrFail($this->userEditing)->update($payload)
+            : User::create($payload);
+
         $this->resetUserForm();
         $this->dispatch('toast', message: 'Сохранено.');
     }
 
     public function editUser(int $id): void
     {
+        $this->guardOwner();
         $user = User::findOrFail($id);
         $this->userEditing = $id;
         $this->userForm = [
@@ -172,12 +217,16 @@ class Index extends Component
 
     public function deleteUser(int $id): void
     {
-        if (User::where('role', Role::Owner)->count() <= 1 && User::find($id)?->isOwner()) {
+        $this->guardOwner();
+
+        $target = User::findOrFail($id);
+        if ($target->isOwner() && User::where('role', Role::Owner)->count() <= 1) {
             $this->dispatch('toast', message: 'Нельзя удалить единственного владельца.');
 
             return;
         }
-        User::findOrFail($id)->delete();
+
+        $target->delete();
         $this->dispatch('toast', message: 'Удалено.');
     }
 
