@@ -1,0 +1,78 @@
+// Формы: поле, инпут, селект, чекбокс.
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &__label {
+        font-size: var(--fs-sm);
+        font-weight: 500;
+        color: var(--color-text-muted);
+    }
+
+    &__input,
+    &__select,
+    &__textarea {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid var(--color-border);
+        border-radius: var(--radius);
+        background: var(--color-surface);
+        color: var(--color-text);
+        font-size: var(--fs-base);
+        transition: border-color .12s, box-shadow .12s;
+
+        &:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px var(--color-primary-050);
+        }
+
+        &::placeholder {
+            color: var(--color-text-soft);
+        }
+    }
+
+    &__textarea {
+        min-height: 90px;
+        resize: vertical;
+    }
+
+    &__error {
+        font-size: var(--fs-xs);
+        color: var(--color-danger);
+    }
+
+    &__hint {
+        font-size: var(--fs-xs);
+        color: var(--color-text-soft);
+    }
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-4);
+}
+
+.checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-sm);
+    color: var(--color-text);
+    cursor: pointer;
+
+    &__input {
+        width: 16px;
+        height: 16px;
+        accent-color: var(--color-primary);
+    }
+}

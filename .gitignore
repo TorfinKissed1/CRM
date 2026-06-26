@@ -34,3 +34,6 @@ Thumbs.db
 /storage/app/imports
 /storage/app/private/imports
 /docker/data
+
+# Dev-роутер встроенного сервера (локально)
+/router.php
