@@ -54,6 +54,9 @@
     --shadow: 0 8px 24px rgba(0, 0, 0, .45);
     --shadow-lg: 0 20px 48px rgba(8, 4, 24, .6);
     --glow-primary: 0 0 0 3px rgba(139, 92, 246, .25); // focus-ring/акцент
+    --bg-glow-1: rgba(139, 92, 246, .07);  // звёздное свечение фона
+    --bg-glow-2: rgba(192, 132, 252, .05);
+    --topbar-shadow: 0 1px 12px rgba(8, 4, 24, .4);
 
     // --- Отступы (шкала 4px) ---
     --space-1: 4px;
@@ -102,5 +105,8 @@
     --shadow: 0 4px 16px rgba(16, 24, 40, .08);
     --shadow-lg: 0 12px 32px rgba(16, 24, 40, .12);
     --glow-primary: 0 0 0 3px rgba(124, 77, 219, .18);
+    --bg-glow-1: rgba(124, 77, 219, .05);
+    --bg-glow-2: rgba(168, 85, 247, .04);
+    --topbar-shadow: 0 1px 3px rgba(16, 24, 40, .06);
 }
 
